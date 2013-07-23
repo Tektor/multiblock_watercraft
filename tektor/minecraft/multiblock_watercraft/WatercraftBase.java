@@ -1,8 +1,14 @@
 package tektor.minecraft.multiblock_watercraft;
 
 import tektor.minecraft.multiblock_watercraft.blocks.TurbineMachinePart;
+import tektor.minecraft.multiblock_watercraft.items.TurbineMachinePartItemBlock;
+import tektor.minecraft.multiblock_watercraft.tile.TurbineMachineTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlockWithMetadata;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Init;
@@ -30,7 +36,7 @@ public class WatercraftBase {
         public static WatercraftCommonProxy proxy;
         
         public static final Block turbineMachinePart = new TurbineMachinePart(1001,Material.iron);
-       
+        //public static final Item turbineMachinePartItemBlock = new TurbineMachinePartItemBlock(9001);
         @EventHandler
         public void preInit(FMLPreInitializationEvent event) {
                 // Stub Method
@@ -39,13 +45,27 @@ public class WatercraftBase {
         @EventHandler
         public void load(FMLInitializationEvent event) {
             registerMachines();    
+            registerRecipes();
+            
         	proxy.registerRenderers();
         }
        
-        private void registerMachines() {
+        private void registerRecipes() {
+			ItemStack ironStack = new ItemStack(Item.ingotIron, 1);
+			ItemStack goldStack = new ItemStack(Item.ingotGold, 1);
+			GameRegistry.addRecipe(new ItemStack(turbineMachinePart,1,1), new Object[]{"AAA","BAB","AAA",'A',ironStack,'B',goldStack});
+			GameRegistry.addRecipe(new ItemStack(turbineMachinePart,1,0), new Object[]{"AAA","ABA","AAA",'A',ironStack,'B',goldStack});
+			
+			
+		}
+
+		private void registerMachines() {
         	//Turbine Machine Part
-        	LanguageRegistry.addName(turbineMachinePart, "Turbine Machine Part");
-    		GameRegistry.registerBlock(turbineMachinePart, "turbineMachinePart");
+        	GameRegistry.registerBlock(turbineMachinePart, "turbineMachinePart");
+    		LanguageRegistry.addName(turbineMachinePart,"Turbine Machine Part");
+    		GameRegistry.registerTileEntity(TurbineMachineTileEntity.class, "turbineMachinePartTileEntity");
+    		//GameRegistry.registerItem(turbineMachinePartItemBlock, "turbineMachinePart");
+    		//LanguageRegistry.addName(turbineMachinePartItemBlock,"Turbine Machine Part");
 			
 		}
 
@@ -53,4 +73,6 @@ public class WatercraftBase {
         public void postInit(FMLPostInitializationEvent event) {
                 // Stub Method
         }
+		
+		
 }
