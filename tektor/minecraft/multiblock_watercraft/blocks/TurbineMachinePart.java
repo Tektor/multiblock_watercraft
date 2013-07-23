@@ -81,19 +81,15 @@ public class TurbineMachinePart extends BlockContainer {
 						tileEntity.convertDummies();
 						if (world.isRemote)
 							player.addChatMessage("Water Turbine Created!");
-					}
-					else
-					{
+					} else {
 						player.addChatMessage("Creation Failed");
 					}
-					// player.openGui(WatercraftBase.instance,
-					// ModConfig.GUIIDs.multiFurnace, world, x, y, z);
-
+				} else {
+					// player.openGui(WatercraftBase.instance,ModConfig.GUIIDs.multiFurnace,
+					// world, x, y, z);
 				}
-			} else {
 
 			}
-
 		}
 
 		return true;
@@ -130,12 +126,14 @@ public class TurbineMachinePart extends BlockContainer {
 			return icons[0];
 		}
 	}
-	
+
 	@Override
-	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase, ItemStack par6ItemStack)
-	{
-		par1World.setBlockMetadataWithNotify(par2, par3, par4, par6ItemStack.getItemDamage(), 3);
-		super.onBlockPlacedBy(par1World, par2, par3, par4, par5EntityLivingBase, par6ItemStack);
+	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4,
+			EntityLivingBase par5EntityLivingBase, ItemStack par6ItemStack) {
+		par1World.setBlockMetadataWithNotify(par2, par3, par4,
+				par6ItemStack.getItemDamage(), 3);
+		super.onBlockPlacedBy(par1World, par2, par3, par4,
+				par5EntityLivingBase, par6ItemStack);
 	}
 
 }
