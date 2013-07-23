@@ -1,7 +1,6 @@
 package tektor.minecraft.multiblock_watercraft;
 
 import tektor.minecraft.multiblock_watercraft.blocks.TurbineMachinePart;
-import tektor.minecraft.multiblock_watercraft.items.TurbineMachinePartItemBlock;
 import tektor.minecraft.multiblock_watercraft.tile.TurbineMachineTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -23,7 +22,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid="multiblock_watercraft", name="MultiBlock Watercraft", version="0.0.1")
+@Mod(modid="multiblock_watercraft", name="MultiBlock Watercraft", version="0.0.3")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class WatercraftBase {
 
@@ -64,8 +63,7 @@ public class WatercraftBase {
         	GameRegistry.registerBlock(turbineMachinePart, "turbineMachinePart");
     		LanguageRegistry.addName(turbineMachinePart,"Turbine Machine Part");
     		GameRegistry.registerTileEntity(TurbineMachineTileEntity.class, "turbineMachinePartTileEntity");
-    		//GameRegistry.registerItem(turbineMachinePartItemBlock, "turbineMachinePart");
-    		//LanguageRegistry.addName(turbineMachinePartItemBlock,"Turbine Machine Part");
+    		
 			
 		}
 
