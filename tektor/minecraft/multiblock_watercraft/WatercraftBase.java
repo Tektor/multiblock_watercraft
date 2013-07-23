@@ -1,6 +1,7 @@
 package tektor.minecraft.multiblock_watercraft;
 
 import tektor.minecraft.multiblock_watercraft.blocks.TurbineMachinePart;
+import tektor.minecraft.multiblock_watercraft.blocks.WaterTurbine;
 import tektor.minecraft.multiblock_watercraft.tile.TurbineMachineTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -22,7 +23,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid="multiblock_watercraft", name="MultiBlock Watercraft", version="0.0.3")
+@Mod(modid="multiblock_watercraft", name="MultiBlock Watercraft", version="0.0.4")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class WatercraftBase {
 
@@ -35,7 +36,7 @@ public class WatercraftBase {
         public static WatercraftCommonProxy proxy;
         
         public static final Block turbineMachinePart = new TurbineMachinePart(1001,Material.iron);
-        //public static final Item turbineMachinePartItemBlock = new TurbineMachinePartItemBlock(9001);
+        public static final Block waterTurbine = new WaterTurbine(1002,Material.iron);
         @EventHandler
         public void preInit(FMLPreInitializationEvent event) {
                 // Stub Method
@@ -44,7 +45,7 @@ public class WatercraftBase {
         @EventHandler
         public void load(FMLInitializationEvent event) {
             registerMachines();    
-            registerRecipes();
+            
             
         	proxy.registerRenderers();
         }
@@ -59,6 +60,10 @@ public class WatercraftBase {
 		}
 
 		private void registerMachines() {
+			//Water Turbine
+			GameRegistry.registerBlock(waterTurbine, "waterTurbine");
+    		LanguageRegistry.addName(waterTurbine,"Water Turbine");
+    		
         	//Turbine Machine Part
         	GameRegistry.registerBlock(turbineMachinePart, "turbineMachinePart");
     		LanguageRegistry.addName(turbineMachinePart,"Turbine Machine Part");
@@ -69,7 +74,7 @@ public class WatercraftBase {
 
 		@EventHandler
         public void postInit(FMLPostInitializationEvent event) {
-                // Stub Method
+			registerRecipes();
         }
 		
 		
