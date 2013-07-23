@@ -82,6 +82,10 @@ public class TurbineMachinePart extends BlockContainer {
 						if (world.isRemote)
 							player.addChatMessage("Water Turbine Created!");
 					}
+					else
+					{
+						player.addChatMessage("Creation Failed");
+					}
 					// player.openGui(WatercraftBase.instance,
 					// ModConfig.GUIIDs.multiFurnace, world, x, y, z);
 

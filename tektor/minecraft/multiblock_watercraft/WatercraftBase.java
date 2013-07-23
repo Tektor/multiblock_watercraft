@@ -23,7 +23,7 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid="multiblock_watercraft", name="MultiBlock Watercraft", version="0.0.4")
+@Mod(modid="multiblock_watercraft", name="MultiBlock Watercraft", version="0.0.5")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class WatercraftBase {
 
