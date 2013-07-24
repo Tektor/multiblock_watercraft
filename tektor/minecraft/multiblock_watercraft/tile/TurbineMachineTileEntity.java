@@ -18,6 +18,8 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 	private int coreX;
 	private int coreY;
 	private int coreZ;
+	public int turbine;
+	
 
 	public TurbineMachineTileEntity() {
 		isValidMultiblock = false;
@@ -30,7 +32,11 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 
 	@Override
 	public float getProvide(ForgeDirection direction) {
-		return 900;
+		if (turbine == 0) {
+			return 900;
+		} else {
+			return 1800;
+		}
 	}
 
 	@Override
@@ -47,6 +53,7 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 		par1.setInteger("coreX", coreX);
 		par1.setInteger("coreY", coreY);
 		par1.setInteger("coreZ", coreZ);
+		par1.setInteger("turbine", turbine);
 	}
 
 	@Override
@@ -58,6 +65,7 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 		coreX = par1.getInteger("coreX");
 		coreY = par1.getInteger("coreY");
 		coreZ = par1.getInteger("coreZ");
+		turbine = par1.getInteger("turbine");
 	}
 
 	public boolean getIsValid() {
@@ -124,10 +132,8 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 					worldObj.setBlockMetadataWithNotify(x, yCoord, z, 5, 3);
 					TurbineMachineTileEntity ent = (TurbineMachineTileEntity) worldObj
 							.getBlockTileEntity(x, yCoord, z);
-					System.out.println(x + yCoord + z);
 					if (ent != null) {
 						ent.setCore(this);
-						System.out.println("++++++++++++called++++++++++");
 					}
 					worldObj.setBlockMetadataWithNotify(x, yCoord - 1, z, 5, 3);
 					ent = (TurbineMachineTileEntity) worldObj
@@ -249,6 +255,7 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 				xCoord + 1, yCoord, zCoord)) {
 			forward = 1;
 			xaxis = true;
+			turbine = worldObj.getBlockMetadata(xCoord + 1, yCoord, zCoord);
 			// same
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
@@ -267,6 +274,7 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 				xCoord - 1, yCoord, zCoord)) {
 			forward = -1;
 			xaxis = true;
+			turbine = worldObj.getBlockMetadata(xCoord - 1, yCoord, zCoord);
 			// same
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
@@ -285,6 +293,7 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 				xCoord, yCoord, zCoord + 1)) {
 			forward = 1;
 			xaxis = false;
+			turbine = worldObj.getBlockMetadata(xCoord, yCoord, zCoord + 1);
 			// same
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
@@ -303,6 +312,7 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 				xCoord, yCoord, zCoord - 1)) {
 			forward = -1;
 			xaxis = false;
+			turbine = worldObj.getBlockMetadata(xCoord, yCoord, zCoord - 1);
 			// same
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
@@ -370,21 +380,33 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 		coreZ = core.zCoord;
 		tileEntityCore = core;
 	}
-	
+
 	@Override
-	public Packet getDescriptionPacket()
-	{
+	public Packet getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
 		this.writeToNBT(tag);
 		return new Packet132TileEntityData(xCoord, yCoord, zCoord, 0, tag);
 	}
+
+	@Override
+	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) {
+		NBTTagCompound tag = pkt.customParam1;
+
+		this.readFromNBT(tag);
+	}
 	
 	@Override
-	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt)
+	public boolean canUpdate()
 	{
-		NBTTagCompound tag = pkt.customParam1;
-		
-		this.readFromNBT(tag);
+		return true;
+	}
+	
+	@Override
+	public void updateEntity()
+	{
+		if (isValidMultiblock && tileEntityCore == null && worldObj.isRemote == false) {
+			this.produce();
+		}
 	}
 
 }
