@@ -81,14 +81,26 @@ public class TurbineMachinePart extends BlockContainer {
 						tileEntity.convertDummies();
 						if (world.isRemote)
 							player.addChatMessage("Water Turbine Created!");
+						return true;
 					} else {
 						player.addChatMessage("Creation Failed");
+						return true;
 					}
 				} else {
-					// player.openGui(WatercraftBase.instance,ModConfig.GUIIDs.multiFurnace,
-					// world, x, y, z);
+					player.addChatMessage("Blub!");
+					return true;
 				}
 
+			}
+			else
+			{
+				TurbineMachineTileEntity dummy = (TurbineMachineTileEntity)world.getBlockTileEntity(x, y, z);
+			     
+			    if(dummy != null && dummy.getCore() != null && dummy.getCore().getIsValid())
+			    {
+			    	TurbineMachineTileEntity core = dummy.getCore();
+			        return core.getBlockType().onBlockActivated(world, core.xCoord, core.yCoord, core.zCoord, player, par6, par7, par8, par9);
+			    }
 			}
 		}
 
@@ -134,6 +146,17 @@ public class TurbineMachinePart extends BlockContainer {
 				par6ItemStack.getItemDamage(), 3);
 		super.onBlockPlacedBy(par1World, par2, par3, par4,
 				par5EntityLivingBase, par6ItemStack);
+	}
+	
+	@Override
+	public void breakBlock(World world, int x, int y, int z, int par5, int par6)
+	{
+	    TurbineMachineTileEntity ent = (TurbineMachineTileEntity)world.getBlockTileEntity(x, y, z);
+	     
+	    if(ent != null && ent.getCore() != null)
+	    	ent.getCore().invalidateMultiblock();
+	     
+	    super.breakBlock(world, x, y, z, par5, par6);
 	}
 
 }

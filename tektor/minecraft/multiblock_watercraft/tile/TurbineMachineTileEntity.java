@@ -2,17 +2,25 @@ package tektor.minecraft.multiblock_watercraft.tile;
 
 import tektor.minecraft.multiblock_watercraft.WatercraftBase;
 import universalelectricity.prefab.tile.TileEntityElectrical;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.INetworkManager;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 
 public class TurbineMachineTileEntity extends TileEntityElectrical {
 
-	private boolean isValidMultiblock = false;
+	public boolean isValidMultiblock;
 	public boolean xaxis = false;
 	public int forward = 0;
+	private TurbineMachineTileEntity tileEntityCore;
+	private int coreX;
+	private int coreY;
+	private int coreZ;
 
 	public TurbineMachineTileEntity() {
-
+		isValidMultiblock = false;
 	}
 
 	@Override
@@ -30,6 +38,28 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 		return 3600000;
 	}
 
+	@Override
+	public void writeToNBT(NBTTagCompound par1) {
+		super.writeToNBT(par1);
+		par1.setBoolean("valid", isValidMultiblock);
+		par1.setBoolean("axis", xaxis);
+		par1.setInteger("forward", forward);
+		par1.setInteger("coreX", coreX);
+		par1.setInteger("coreY", coreY);
+		par1.setInteger("coreZ", coreZ);
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound par1) {
+		super.readFromNBT(par1);
+		isValidMultiblock = par1.getBoolean("valid");
+		xaxis = par1.getBoolean("axis");
+		forward = par1.getInteger("forward");
+		coreX = par1.getInteger("coreX");
+		coreY = par1.getInteger("coreY");
+		coreZ = par1.getInteger("coreZ");
+	}
+
 	public boolean getIsValid() {
 		return isValidMultiblock;
 	}
@@ -39,31 +69,48 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 			// ring
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
-					worldObj.setBlockMetadataWithNotify(xCoord+(k*forward), yCoord, zCoord+i, 0, 3);
-					worldObj.setBlockMetadataWithNotify(xCoord+(k*forward), yCoord-1, zCoord+i, 0, 3);
+					worldObj.setBlockMetadataWithNotify(xCoord + (k * forward),
+							yCoord, zCoord + i, 0, 3);
+					worldObj.setBlockMetadataWithNotify(xCoord + (k * forward),
+							yCoord - 1, zCoord + i, 0, 3);
 				}
 			}
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward*2), yCoord, zCoord,0,3);
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward*2), yCoord-1, zCoord,0,3);
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord, 0,
+					3);
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward * 2), yCoord,
+					zCoord, 0, 3);
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward * 2),
+					yCoord - 1, zCoord, 0, 3);
 			// middle
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord+1, zCoord,0,3);
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord-1, zCoord,0,3);
-			
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord + 1,
+					zCoord, 0, 3);
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord - 1,
+					zCoord, 0, 3);
+			isValidMultiblock = false;
 		} else {
 			// ring
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
-					worldObj.setBlockMetadataWithNotify(xCoord+i, yCoord, zCoord+(k*forward), 0, 3);
-					worldObj.setBlockMetadataWithNotify(xCoord+i, yCoord-1, zCoord+(k*forward), 0, 3);
+					worldObj.setBlockMetadataWithNotify(xCoord + i, yCoord,
+							zCoord + (k * forward), 0, 3);
+					worldObj.setBlockMetadataWithNotify(xCoord + i, yCoord - 1,
+							zCoord + (k * forward), 0, 3);
 				}
 			}
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord, zCoord+ (forward*2),0,3);
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord-1, zCoord+ (forward*2),0,3);
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord, 0,
+					3);
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord
+					+ (forward * 2), 0, 3);
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord
+					+ (forward * 2), 0, 3);
 			// middle
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord+1, zCoord+ (forward),0,3);
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord-1, zCoord+ (forward),0,3);
-
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord + 1, zCoord
+					+ (forward), 0, 3);
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord
+					+ (forward), 0, 3);
+			isValidMultiblock = false;
 		}
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 
 	}
 
@@ -72,31 +119,123 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 			// ring
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
-					worldObj.setBlockMetadataWithNotify(xCoord+(k*forward), yCoord, zCoord+i, 5, 3);
-					worldObj.setBlockMetadataWithNotify(xCoord+(k*forward), yCoord-1, zCoord+i, 5, 3);
+					int x = xCoord + (k * forward);
+					int z = zCoord + i;
+					worldObj.setBlockMetadataWithNotify(x, yCoord, z, 5, 3);
+					TurbineMachineTileEntity ent = (TurbineMachineTileEntity) worldObj
+							.getBlockTileEntity(x, yCoord, z);
+					System.out.println(x + yCoord + z);
+					if (ent != null) {
+						ent.setCore(this);
+						System.out.println("++++++++++++called++++++++++");
+					}
+					worldObj.setBlockMetadataWithNotify(x, yCoord - 1, z, 5, 3);
+					ent = (TurbineMachineTileEntity) worldObj
+							.getBlockTileEntity(x, yCoord - 1, z);
+					if (ent != null) {
+						ent.setCore(this);
+					}
 				}
 			}
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward*2), yCoord, zCoord,5,3);
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward*2), yCoord-1, zCoord,5,3);
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward * 2), yCoord,
+					zCoord, 5, 3);
+			TurbineMachineTileEntity ent = (TurbineMachineTileEntity) worldObj
+					.getBlockTileEntity(xCoord + (forward * 2), yCoord, zCoord);
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward * 2),
+					yCoord - 1, zCoord, 5, 3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(xCoord
+					+ (forward * 2), yCoord - 1, zCoord);
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord, 0,
+					3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(
+					xCoord, yCoord - 1, zCoord);
+			if (ent != null) {
+				ent.setCore(this);
+			}
 			// middle
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord+1, zCoord,5,3);
-			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord-1, zCoord,5,3);
-			
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord + 1,
+					zCoord, 5, 3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(xCoord
+					+ (forward), yCoord + 1, zCoord);
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			worldObj.setBlockMetadataWithNotify(xCoord + (forward), yCoord - 1,
+					zCoord, 5, 3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(xCoord
+					+ (forward), yCoord - 1, zCoord);
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			isValidMultiblock = true;
+
 		} else {
 			// ring
 			for (int i = -1; i < 2; i = i + 2) {
 				for (int k = 0; k < 3; k++) {
-					worldObj.setBlockMetadataWithNotify(xCoord+i, yCoord, zCoord+(k*forward), 5, 3);
-					worldObj.setBlockMetadataWithNotify(xCoord+i, yCoord-1, zCoord+(k*forward), 5, 3);
+					worldObj.setBlockMetadataWithNotify(xCoord + i, yCoord,
+							zCoord + (k * forward), 5, 3);
+					TurbineMachineTileEntity ent = (TurbineMachineTileEntity) worldObj
+							.getBlockTileEntity(xCoord + i, yCoord, zCoord
+									+ (k * forward));
+					if (ent != null) {
+						ent.setCore(this);
+					}
+					worldObj.setBlockMetadataWithNotify(xCoord + i, yCoord - 1,
+							zCoord + (k * forward), 5, 3);
+					ent = (TurbineMachineTileEntity) worldObj
+							.getBlockTileEntity(xCoord + i, yCoord - 1, zCoord
+									+ (k * forward));
+					if (ent != null) {
+						ent.setCore(this);
+					}
 				}
 			}
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord, zCoord+ (forward*2),5,3);
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord-1, zCoord+ (forward*2),5,3);
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord
+					+ (forward * 2), 5, 3);
+			TurbineMachineTileEntity ent = (TurbineMachineTileEntity) worldObj
+					.getBlockTileEntity(xCoord, yCoord, zCoord + (forward * 2));
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord
+					+ (forward * 2), 5, 3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(
+					xCoord, yCoord - 1, zCoord + (forward * 2));
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord, 0,
+					3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(
+					xCoord, yCoord - 1, zCoord);
+			if (ent != null) {
+				ent.setCore(this);
+			}
 			// middle
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord+1, zCoord+ (forward),5,3);
-			worldObj.setBlockMetadataWithNotify(xCoord , yCoord-1, zCoord+ (forward),5,3);
-
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord + 1, zCoord
+					+ (forward), 5, 3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(
+					xCoord, yCoord + 1, zCoord + (forward));
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			worldObj.setBlockMetadataWithNotify(xCoord, yCoord - 1, zCoord
+					+ (forward), 5, 3);
+			ent = (TurbineMachineTileEntity) worldObj.getBlockTileEntity(
+					xCoord, yCoord - 1, zCoord + (forward));
+			if (ent != null) {
+				ent.setCore(this);
+			}
+			isValidMultiblock = true;
 		}
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 
 	}
 
@@ -185,8 +324,8 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 
 	private boolean checkTurbinePart(int i, int j, int k) {
 		return ((WatercraftBase.turbineMachinePart.blockID == worldObj
-				.getBlockId(i, j, k)) && 0 == worldObj
-				.getBlockMetadata(i, j, k));
+				.getBlockId(i, j, k)) && (0 == worldObj.getBlockMetadata(i, j,
+				k)));
 	}
 
 	private boolean checkBase(boolean axis, int forward) {
@@ -214,8 +353,38 @@ public class TurbineMachineTileEntity extends TileEntityElectrical {
 
 	public void invalidateMultiblock() {
 		isValidMultiblock = false;
-
 		revertDummies();
+	}
+
+	public TurbineMachineTileEntity getCore() {
+		if (tileEntityCore == null)
+			tileEntityCore = (TurbineMachineTileEntity) worldObj
+					.getBlockTileEntity(coreX, coreY, coreZ);
+
+		return tileEntityCore;
+	}
+
+	public void setCore(TurbineMachineTileEntity core) {
+		coreX = core.xCoord;
+		coreY = core.yCoord;
+		coreZ = core.zCoord;
+		tileEntityCore = core;
+	}
+	
+	@Override
+	public Packet getDescriptionPacket()
+	{
+		NBTTagCompound tag = new NBTTagCompound();
+		this.writeToNBT(tag);
+		return new Packet132TileEntityData(xCoord, yCoord, zCoord, 0, tag);
+	}
+	
+	@Override
+	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt)
+	{
+		NBTTagCompound tag = pkt.customParam1;
+		
+		this.readFromNBT(tag);
 	}
 
 }
